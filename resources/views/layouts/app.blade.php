@@ -19,6 +19,7 @@
                 <a href="{{ route('posts.create') }} " class="p-2 text-dark">Add Blog Post</a>
             </nav>
         </div>
+        
         <div>
             @if(session('status'))
             <div class="alert alert-success">
