@@ -36,6 +36,13 @@ class UserFactory extends Factory
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
+    public function ashleyTheClown(){
+        return $this->state([
+            'name' => 'Ashley the clown',
+            'email' => 'development@jumpingfoxsoftware.com',
+        ]);
+    }
+
     public function unverified()
     {
         return $this->state(function (array $attributes) {

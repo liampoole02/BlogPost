@@ -6,6 +6,7 @@ use App\Http\Requests\StorePost;
 // use Illuminate\Http\Request\Request;
 use App\Models\BlogPost;
 // use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class PostsController extends Controller
 {
@@ -15,6 +16,13 @@ class PostsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {
+        $this->middleware('auth')
+            ->only(['create', 'store', 'edit', 'updated', 'destroy']);
+    }
+
     public function index()
     {
 
@@ -31,7 +39,7 @@ class PostsController extends Controller
         // dd(DB::getQueryLog());
 
         return view(
-            'posts.index', 
+            'posts.index',
             ['posts' => BlogPost::withCount('comments')->get()]
         );
     }
@@ -54,12 +62,12 @@ class PostsController extends Controller
      */
     public function store(StorePost $request)
     {
-        $validated=$request->validated();
-        $post=BlogPost::create($validated);
+        $validated = $request->validated();
+        $post = BlogPost::create($validated);
 
-        $request->session()->flash('status', 'The blog post was created!');
+        // $request->session()->flash('status', 'The blog post was created!');
 
-        return redirect()->route('posts.show', ['post'=> $post->id]);
+        return redirect()->route('posts.show', ['post' => $post->id]);
     }
 
     /**
@@ -71,7 +79,7 @@ class PostsController extends Controller
     public function show($id)
     {
         // abort_if(!isset($this->posts[$id]), 404);
-        return view('posts.show', ['post' => BlogPost::findOrFail($id)]);
+        return view('posts.show', ['post' => BlogPost::with('comments')->findOrFail($id)]);
     }
 
     /**
@@ -82,7 +90,7 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        return view('posts.edit', ['post'=> BlogPost::findOrFail($id)]);
+        return view('posts.edit', ['post' => BlogPost::findOrFail($id)]);
     }
 
     /**
@@ -94,15 +102,21 @@ class PostsController extends Controller
      */
     public function update(StorePost $request, $id)
     {
-        $post=BlogPost::findOrFail($id);
-        $validated=$request->validated();
+        $post = BlogPost::findOrFail($id);
 
-        $post->fill($validated);
-        $post->save();
+        if (Gate::denies('update-post', $post)) {
+            abort(403, "Stop! You are not allowed to edit this blog post!");
+        } else {
 
-        $request->session()->flash('status', 'Blog post was updated!');
+            $validated = $request->validated();
 
-        return redirect()->route('posts.show', ['post'=>$post->id]);
+            $post->fill($validated);
+            $post->save();
+
+            $request->session()->flash('status', 'Blog post was updated!');
+
+            return redirect()->route('posts.show', ['post' => $post->id]);
+        }
     }
 
     /**K
@@ -113,7 +127,7 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        $post=BlogPost::findOrFail($id);
+        $post = BlogPost::findOrFail($id);
         $post->delete();
 
         session()->flash('status', 'Blog post was deleted!');

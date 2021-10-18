@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Auth::routes();
 // Route::get('/', function () {
 //     return view('home.index');
 // })->name('home.index');
@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 //The below 2 routes can be used when we are rendering simple pages
 Route::get('/', [HomeController::class, 'home'])
     ->name('home.index');
+    // ->middleware('auth');
 Route::get('/contact', [HomeController::class, 'contact'])
     ->name('home.contact');
 
@@ -37,24 +38,24 @@ Route::get('about', function () {
     return view('home.about');
 })->name('home.about');
 
-$posts = [
-    1 => [
-        'title' => 'Intro to Laravel',
-        'content' => 'This is a short intro to Laravel',
-        'is_new' => true,
-        'has_new' => true
-    ],
-    2 => [
-        'title' => 'Intro to PHP',
-        'content' => 'This is a short intro to PHP',
-        'is_new' => false
-    ],
-    3 => [
-        'title' => 'Intro to Golang',
-        'content' => 'Laravel is lit',
-        'is_new' => false
-    ]
-];
+// $posts = [
+//     1 => [
+//         'title' => 'Intro to Laravel',
+//         'content' => 'This is a short intro to Laravel',
+//         'is_new' => true,
+//         'has_new' => true
+//     ],
+//     2 => [
+//         'title' => 'Intro to PHP',
+//         'content' => 'This is a short intro to PHP',
+//         'is_new' => false
+//     ],
+//     3 => [
+//         'title' => 'Intro to Golang',
+//         'content' => 'Laravel is lit',
+//         'is_new' => false
+//     ]
+// ];
 
 // Route::get('/recent-posts/{days_ago?}', function ($daysAgo=20){
 //     return 'Posts from ' . $daysAgo . ' days ago';
@@ -84,26 +85,26 @@ $posts = [
 Route::resource('posts', PostsController::class);
 // ->only(['index', 'show', 'create', 'store', 'edit', 'update'])
 
-Route::prefix('/fun')->name('fun.')->group(function () use ($posts) {
-    Route::get('reponses', function () use ($posts) {
-        return response($posts, 201)
-            ->header('Content-Type', 'application/json')
-            ->cookie('MY_COOKIE', 'Liam Poole', 3600);
-    })->name('responses');
+// Route::prefix('/fun')->name('fun.')->group(function () use ($posts) {
+//     Route::get('reponses', function () use ($posts) {
+//         return response($posts, 201)
+//             ->header('Content-Type', 'application/json')
+//             ->cookie('MY_COOKIE', 'Liam Poole', 3600);
+//     })->name('responses');
 
-    Route::get('redirect', function () {
-        return redirect('/contact');
-    })->name('redirect');
+//     Route::get('redirect', function () {
+//         return redirect('/contact');
+//     })->name('redirect');
 
-    Route::get('back', function () {
-        return back();
-    })->name('back');
+//     Route::get('back', function () {
+//         return back();
+//     })->name('back');
 
-    Route::get('away', function () {
-        return redirect()->away('https://www.google.com');
-    })->name('away');
+//     Route::get('away', function () {
+//         return redirect()->away('https://www.google.com');
+//     })->name('away');
 
-    Route::get('download', function () {
-        return response()->download(public_path('/4035857.jpg'), 'BMW');
-    })->name('download');
-});
+//     Route::get('download', function () {
+//         return response()->download(public_path('/4035857.jpg'), 'BMW');
+//     })->name('download');
+// });

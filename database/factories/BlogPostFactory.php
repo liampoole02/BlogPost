@@ -4,8 +4,7 @@ namespace Database\Factories;
 
 use App\Models\BlogPost;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
-
+use Illuminate\Support\Str;
 
 class BlogPostFactory extends Factory
 {
@@ -33,7 +32,7 @@ class BlogPostFactory extends Factory
     public function newTitle(){
         return $this->state([
             'title'=>'New Title',
-            // 'content' =>'Content of the blog post'
+            'content' =>'Content of the blog post'
         ]);
     }
 }

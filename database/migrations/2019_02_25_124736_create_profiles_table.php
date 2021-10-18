@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateProfilesTable extends Migration
 {
@@ -14,12 +14,12 @@ class CreateProfilesTable extends Migration
     public function up()
     {
         Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->timestamps();
 
             $table->unsignedInteger('author_id')->unique();
             $table->foreign('author_id')->references('id')->on('authors');
-            });
+        });
     }
 
     /**
