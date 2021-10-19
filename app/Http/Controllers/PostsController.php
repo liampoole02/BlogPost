@@ -51,6 +51,7 @@ class PostsController extends Controller
      */
     public function create()
     {
+        $this->authorize('posts.create');
         return view('posts.create');
     }
 
@@ -90,6 +91,9 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
+        $post=BlogPost::findOrFail($id);
+        $this->authorize('update', $post);
+
         return view('posts.edit', ['post' => BlogPost::findOrFail($id)]);
     }
 
@@ -103,10 +107,12 @@ class PostsController extends Controller
     public function update(StorePost $request, $id)
     {
         $post = BlogPost::findOrFail($id);
+        
+        $this->authorize('posts.update', $post);
 
-        if (Gate::denies('update-post', $post)) {
-            abort(403, "Stop! You are not allowed to edit this blog post!");
-        } else {
+        // if (Gate::denies('update-post', $post)) {
+        //     abort(403, "Stop! You are not allowed to edit this blog post!");
+        // } else {
 
             $validated = $request->validated();
 
@@ -116,7 +122,6 @@ class PostsController extends Controller
             $request->session()->flash('status', 'Blog post was updated!');
 
             return redirect()->route('posts.show', ['post' => $post->id]);
-        }
     }
 
     /**K
@@ -128,6 +133,13 @@ class PostsController extends Controller
     public function destroy($id)
     {
         $post = BlogPost::findOrFail($id);
+
+        $this->authorize('posts.delete', $post);
+
+        // if(Gate::denies('delete-post', $post)){
+        //     abort(403, "Stop!! You are not allowed to delete someones else's blog-post");
+        // }
+
         $post->delete();
 
         session()->flash('status', 'Blog post was deleted!');
