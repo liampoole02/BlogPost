@@ -4,25 +4,30 @@
 
 @section('content')
 
-<h1>{{ $post->title}} </h1>
-<p> {{ $post->content}} </p>
-<p>Added {{ $post->created_at->diffForHumans() }}</p>
+    <h1>{{ $post->title }}
+        <x-badge type="success" :show="now()->diffInMinutes($post->created_at)<5">
+            Brand new Post!
+        </x-badge>
+    </h1>
 
-@if(now()->diffInMinutes($post->created_at)<5) <div class="alert alert-info">New!</div>
-    @endif
+    <p> {{ $post->content }} </p>
+
+    <x-updated :date="$post->created_at" :name="$post->user->name">
+        By {{ $post->user->name }}
+    </x-updated>
 
     <h4>Comments</h4>
 
     @forelse($post->comments as $comment)
-    <p>
-        {{ $comment->content }}
-    </p>
+        <p>
+            {{ $comment->content }}
+        </p>
 
-    <p class="text-muted">
-        added {{ $comment ->created_at-> diffForHumans() }}
-    </p>
+        <x-updated :date="$comment->created_at">
+            By {{ $post->user->name }}
+        </x-updated>
     @empty
-    <p>No comments yet!</p>
+        <p>No comments yet!</p>
     @endforelse
 
-    @endsection
+@endsection

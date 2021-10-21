@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Auth::routes();
 // Route::get('/', function () {
 //     return view('home.index');
@@ -28,11 +29,15 @@ Auth::routes();
 //The below 2 routes can be used when we are rendering simple pages
 Route::get('/', [HomeController::class, 'home'])
     ->name('home.index');
-    // ->middleware('auth');
+// ->middleware('auth');
 Route::get('/contact', [HomeController::class, 'contact'])
     ->name('home.contact');
 
-Route::get('/single', AboutController::class);    
+Route::get('/secret', [HomeController::class, 'secret'])
+    ->name('secret')
+    ->middleware('can:home.secret');
+
+Route::get('/single', AboutController::class);
 
 Route::get('about', function () {
     return view('home.about');

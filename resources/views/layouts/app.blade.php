@@ -7,8 +7,8 @@
     <title>Business information @yield('title')</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ mix('css/app.css')}}">
-    <script src="{{ mix('js/app.js')}}" async defer></script>
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    <script src="{{ mix('js/app.js') }}" async defer></script>
 </head>
 
 <body>
@@ -22,29 +22,29 @@
 
             @guest
 
-            @if (Route::has('register'))
-              <a class="p-2 text-dark" href="{{ route('register') }}">Register</a>
-            @endif
-            <a class="p-2 text-dark" href="{{ route('login') }}">Login</a>
+                @if (Route::has('register'))
+                    <a class="p-2 text-dark" href="{{ route('register') }}">Register</a>
+                @endif
+                <a class="p-2 text-dark" href="{{ route('login') }}">Login</a>
 
             @else
-            <a class="p-2 text-dark" href="{{ route('logout') }}" 
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-            >Logout ({{ Auth::user()->name}})</a>
+                <a class="p-2 text-dark" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout
+                    ({{ Auth::user()->name }})</a>
 
-            <form id="logout-form" action={{ route('logout') }} method="POST" style="display: none;">
-                @csrf
+                <form id="logout-form" action={{ route('logout') }} method="POST" style="display: none;">
+                    @csrf
 
-            </form>
+                </form>
             @endguest
         </nav>
     </div>
 
     <div class="container">
-        @if(session()->has('status'))
-        <p style="color: green">
-            {{ session()->get('status') }}
-        </p>
+        @if (session()->has('status'))
+            <p style="color: green">
+                {{ session()->get('status') }}
+            </p>
         @endif
 
         @yield('content')
