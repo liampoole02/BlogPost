@@ -21,7 +21,6 @@
             <a href="{{ route('posts.create') }} " class="p-2 text-dark">Add</a>
 
             @guest
-
                 @if (Route::has('register'))
                     <a class="p-2 text-dark" href="{{ route('register') }}">Register</a>
                 @endif

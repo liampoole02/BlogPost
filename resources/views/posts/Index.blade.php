@@ -33,23 +33,26 @@
                     <p>No comments yet! </p>
                 @endif
 
-                @can('update', $post)
-                    <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="btn btn-primary">
-                        Edit
-                    </a>
-                @endcan
-
-                @if (!$post->trashed())
-                    @can('delete', $post)
-                        <form class="d-inline" action="{{ route('posts.destroy', ['post' => $post->id]) }}"
-                            method="POST">
-                            @csrf
-                            @method('DELETE')
-
-                            <input type="submit" value="Delete!" class="btn btn-primary">
-                        </form>
+                @auth
+                    @can('update', $post)
+                        <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="btn btn-primary">
+                            Edit
+                        </a>
                     @endcan
-                @endif
+                @endauth
+
+                @auth
+                    @if (!$post->trashed())
+                        @can('delete', $post)
+                            <form class="d-inline" action="{{ route('posts.destroy', ['post' => $post->id]) }}"
+                                method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <input type="submit" value="Delete!" class="btn btn-primary">
+                            </form>
+                        @endcan
+                    @endif
+                @endauth
                 </p>
 
             @empty
@@ -57,33 +60,36 @@
             @endforelse
         </div>
 
-        <div class="row">
-            <x-card title="Most Commented" subtitle="What people are currently talking about">
-                @slot('items')
-                    @foreach ($mostCommented as $post)
-                        <li class="list-group-item">
-                            <a href="{{ route('posts.show', ['post' => $post->id]) }}">
-                                {{ $post->title }}
-                            </a>
-                        </li>
-                    @endforeach
-                @endslot
-            </x-card>
-        </div>
-        
-        <div class="row mt-4">
-            <x-card title="Most Active" subtitle="Users with most posts written"
-                :items="collect($mostActive)->pluck('name')">
-            </x-card>
-        </div>
-        <div class="row mt-4">
-            <x-card title="Most Active Last Month" subtitle="Users with most posts written in the last month"
-                :items="collect($mostActiveLastMonth)->pluck('name')">
-            </x-card>
-        </div>
-    </div>
+        <div class="col-4">
+            <div class="container">
+                <div class="row">
+                    <x-card title="Most Commented" subtitle="What people are currently talking about">
+                        @slot('items')
+                            @foreach ($mostCommented as $post)
+                                <li class="list-group-item">
+                                    <a href="{{ route('posts.show', ['post' => $post->id]) }}">
+                                        {{ $post->title }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endslot
+                    </x-card>
+                </div>
 
-    </div>
+                <div class="row mt-4">
+                    <x-card title="Most Active" subtitle="Users with most posts written"
+                        :items="collect($mostActive)->pluck('name')">
+                    </x-card>
+                </div>
+
+                <div class="row mt-4">
+                    <x-card title="Most Active Last Month" subtitle="Users with most posts written in the last month"
+                        :items="collect($mostActiveLastMonth)->pluck('name')">
+                    </x-card>
+                </div>
+            </div>
+
+        </div>
     </div>
     </div>
 
