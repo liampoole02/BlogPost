@@ -24,7 +24,6 @@
         </p>
 
         <x-updated :date="$comment->created_at">
-            By {{ $post->user->name }}
         </x-updated>
     @empty
         <p>No comments yet!</p>
