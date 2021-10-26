@@ -27,22 +27,23 @@ class PostsController extends Controller
 
     public function index()
     {
-        $mostCommented=Cache::remember('mostCommented', now()->addSeconds(10), function(){
+        $mostCommented = Cache::remember('blog-post-commeted', 60, function () {
             return BlogPost::mostCommented()->take(5)->get();
         });
-        $mostActive=Cache::remember('mostActive', now()->addSeconds(10), function(){
+        $mostActive = Cache::remember('users-most-active', 60, function () {
             return User::withMostBlogPosts()->take(5)->get();
         });
-        $mostActiveLastMonth=Cache::remember('mostActiveLastMonth', now()->addSeconds(10), function(){
+        $mostActiveLastMonth = Cache::remember('users-most-active-last-month', 60, function () {
             return User::withMostBlogPostsLastMonth()->take(5)->get();
         });
 
         return view(
             'posts.index',
-            ['posts' => BlogPost::latest()->withCount('comments')->with('user')->get(),
-            'mostCommented' => $mostCommented,
-            'mostActive' => $mostActive,
-            'mostActiveLastMonth' => $mostActiveLastMonth
+            [
+                'posts' => BlogPost::latest()->withCount('comments')->with('user')->get(),
+                'mostCommented' => $mostCommented,
+                'mostActive' => $mostActive,
+                'mostActiveLastMonth' => $mostActiveLastMonth
             ]
         );
     }
@@ -68,10 +69,8 @@ class PostsController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['user_id']=$request->user()->id;
+        $validated['user_id'] = $request->user()->id;
         $post = BlogPost::create($validated);
-
-        // $request->session()->flash('status', 'The blog post was created!');
 
         return redirect()->route('posts.show', ['post' => $post->id]);
     }
@@ -84,11 +83,50 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        // abort_if(!isset($this->posts[$id]), 404);
+
+        $blogPost = Cache::tags(['blog-post'])->remember("blog-post-{$id}", 600, function () use ($id) {
+            return BlogPost::with('comments')->with('tags')->with('user')->findOrFail($id);
+        });
+
+        $sessionId = session()->getId();
+        $counterKey = "blog-post-{$id}-counter";
+        $usersKey = "blog-post-{$id}-users";
+
+        $users = Cache::get($usersKey, []);
+        $usersUpdate = [];
+        $difference = 0;
+        $now = now();
+
+        foreach ($users as $session => $lastVisit) {
+            if ($now->diffInMinutes($lastVisit) >= 1) {
+                $difference--;
+            } else {
+                $usersUpdate[$session] = $lastVisit;
+            }
+        }
+
+        if (
+            !array_key_exists($sessionId, $users)
+            || $now->diffInMinutes($users[$sessionId]) >= 1
+        ) {
+            $difference++;
+        }
+
+        $usersUpdate[$sessionId] = $now;
+        Cache::forever($usersKey, $usersUpdate);
+
+        if (!Cache::has($counterKey)) {
+            Cache::forever($counterKey, 1);
+        } else {
+            Cache::increment($counterKey, $difference);
+        }
+
+        $counter = Cache::get($counterKey);
+        
         return view('posts.show', [
-            'post' => BlogPost::with(['comments'=> function($query){
-                return $query->latest();
-        }])->findOrFail($id)]);
+            'post' => $blogPost,
+            'counter' => $counter,
+        ]);
     }
 
     /**
@@ -99,7 +137,7 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        $post=BlogPost::findOrFail($id);
+        $post = BlogPost::findOrFail($id);
         $this->authorize('update', $post);
 
         return view('posts.edit', ['post' => BlogPost::findOrFail($id)]);
@@ -115,21 +153,21 @@ class PostsController extends Controller
     public function update(StorePost $request, $id)
     {
         $post = BlogPost::findOrFail($id);
-        
+
         $this->authorize('posts.update', $post);
 
         // if (Gate::denies('update-post', $post)) {
         //     abort(403, "Stop! You are not allowed to edit this blog post!");
         // } else {
 
-            $validated = $request->validated();
+        $validated = $request->validated();
 
-            $post->fill($validated);
-            $post->save();
+        $post->fill($validated);
+        $post->save();
 
-            $request->session()->flash('status', 'Blog post was updated!');
+        $request->session()->flash('status', 'Blog post was updated!');
 
-            return redirect()->route('posts.show', ['post' => $post->id]);
+        return redirect()->route('posts.show', ['post' => $post->id]);
     }
 
     /**K
@@ -142,11 +180,7 @@ class PostsController extends Controller
     {
         $post = BlogPost::findOrFail($id);
 
-        $this->authorize( $post);
-
-        // if(Gate::denies('delete-post', $post)){
-        //     abort(403, "Stop!! You are not allowed to delete someones else's blog-post");
-        // }
+        $this->authorize($post);
 
         $post->delete();
 

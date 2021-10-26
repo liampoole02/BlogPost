@@ -3,8 +3,9 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\PostTagController;
+
 use Illuminate\Support\Facades\Route;
-// use Illuminate\Https\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,9 @@ Auth::routes();
 Route::get('/', [HomeController::class, 'home'])
     ->name('home.index');
 // ->middleware('auth');
+
+Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tags.index');
+
 Route::get('/contact', [HomeController::class, 'contact'])
     ->name('home.contact');
 

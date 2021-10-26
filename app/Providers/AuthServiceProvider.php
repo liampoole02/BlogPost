@@ -38,8 +38,8 @@ class AuthServiceProvider extends ServiceProvider
         //     return $user->id==$post->user_id;
         // });
 
-        // Gate::define('posts.update', 'App\Policies\BlogPostPolicy@update');
-        // Gate::define('posts.delete', 'App\Policies\BlogPostPolicy@delete');
+        Gate::define('posts.update', 'App\Policies\BlogPostPolicy@update');
+        Gate::define('posts.delete', 'App\Policies\BlogPostPolicy@delete');
 
         // Gate::resource('posts', 'App\Policies\BlogPostPolicy');
 

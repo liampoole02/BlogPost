@@ -13,8 +13,17 @@
     <p> {{ $post->content }} </p>
 
     <x-updated :date="$post->created_at" :name="$post->user->name">
+    </x-updated>
+
+    <x-updated :date="$post->updated_at" :name="$post->user->name">
         By {{ $post->user->name }}
     </x-updated>
+
+    <p> Currently read {{ $counter }} people </p>
+
+    <x-tags :tags="$post->tags">
+
+    </x-tags>
 
     <h4>Comments</h4>
 

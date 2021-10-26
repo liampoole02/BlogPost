@@ -27,6 +27,11 @@
                     Updated
                 </x-updated>
 
+
+                <x-tags :tags="$post->tags">
+
+                </x-tags>
+
                 @if ($post->comment_count >= 0)
                     <p> {{ $post->comments_count }} comments </p>
                 @else
