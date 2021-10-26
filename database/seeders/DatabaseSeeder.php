@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UsersTableSeeder::class,
             BlogPostsSeeder::class,
-            CommentSeeder::class
+            CommentSeeder::class,
+            TagsTableSeeder::class,
+            BlogPostTagTableSeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
         // DB::table('users')->insert(

@@ -27,23 +27,11 @@ class PostsController extends Controller
 
     public function index()
     {
-        $mostCommented = Cache::remember('blog-post-commeted', 60, function () {
-            return BlogPost::mostCommented()->take(5)->get();
-        });
-        $mostActive = Cache::remember('users-most-active', 60, function () {
-            return User::withMostBlogPosts()->take(5)->get();
-        });
-        $mostActiveLastMonth = Cache::remember('users-most-active-last-month', 60, function () {
-            return User::withMostBlogPostsLastMonth()->take(5)->get();
-        });
 
         return view(
             'posts.index',
             [
-                'posts' => BlogPost::latest()->withCount('comments')->with('user')->get(),
-                'mostCommented' => $mostCommented,
-                'mostActive' => $mostActive,
-                'mostActiveLastMonth' => $mostActiveLastMonth
+                'posts' => BlogPost::latest()->withCount('comments')->with('user')->with('tags')->get(),
             ]
         );
     }
@@ -122,7 +110,7 @@ class PostsController extends Controller
         }
 
         $counter = Cache::get($counterKey);
-        
+
         return view('posts.show', [
             'post' => $blogPost,
             'counter' => $counter,

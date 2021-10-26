@@ -7,6 +7,7 @@ use App\Http\Controllers\PostTagController;
 
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,7 +19,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes();
 // Route::get('/', function () {
 //     return view('home.index');
 // })->name('home.index');
@@ -117,3 +117,4 @@ Route::resource('posts', PostsController::class);
 //         return response()->download(public_path('/4035857.jpg'), 'BMW');
 //     })->name('download');
 // });
+Auth::routes();
