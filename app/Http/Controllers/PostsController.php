@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 // use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
+use Storage;
 
 class PostsController extends Controller
 {
@@ -31,7 +33,7 @@ class PostsController extends Controller
         return view(
             'posts.index',
             [
-                'posts' => BlogPost::latest()->withCount('comments')->with('user')->with('tags')->get(),
+                'posts' => BlogPost::latestWithRelations()->get(),
             ]
         );
     }
@@ -60,6 +62,29 @@ class PostsController extends Controller
         $validated['user_id'] = $request->user()->id;
         $post = BlogPost::create($validated);
 
+        $hasFile=$request->hasFile('thumbnail');
+
+        dump($hasFile);
+
+        if($hasFile){
+            $file=$request->file('thumbnail');
+            dump($file);
+            dump($file->getClientMimeType());
+            dump($file->getClientOriginalExtension());
+
+            dump($file->store('thumbnails'));
+            dump(Storage::disk('public')->putFile('thumbnails', $file));
+
+            $name1=$file->storeAs('thumbnails', $post->id . '.'. $file->guessExtension());
+            $name2=Storage::disk('local')->putFileAs('thumbnails', $file, $post->id . '.' . $file->guessExtension());
+
+            dump(Storage::url($name1));
+            dump(Storage::disk('local')->url($name2));
+        }
+        die;
+
+        $request->session()->flash('status', 'Blog Post was created');
+
         return redirect()->route('posts.show', ['post' => $post->id]);
     }
 
@@ -73,7 +98,8 @@ class PostsController extends Controller
     {
 
         $blogPost = Cache::tags(['blog-post'])->remember("blog-post-{$id}", 600, function () use ($id) {
-            return BlogPost::with('comments')->with('tags')->with('user')->findOrFail($id);
+            return BlogPost::with('comments', 'tags', 'user', 'comments.user')
+                ->findOrFail($id);
         });
 
         $sessionId = session()->getId();

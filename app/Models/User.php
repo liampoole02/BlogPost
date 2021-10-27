@@ -47,6 +47,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\BlogPost');
     }
 
+    public function comments(){
+        return $this->hasMany('App\Models\Comment');
+    }
+
     public function scopeWithMostBlogPosts(Builder $query){
         return $query->withCount('blogPosts')->orderBy('blog_posts_count', 'desc');
     }
