@@ -13,9 +13,7 @@ class AddUserToCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::table('comments', function (Blueprint $table) {
-                // $table->unsignedInteger('user_id')->nullable();
-            
+        Schema::table('comments', function (Blueprint $table) {       
                 if (env('DB_CONNECTION') === 'sqlite_testing') {
                     $table->unsignedInteger('user_id')->default(0);
                 } else {

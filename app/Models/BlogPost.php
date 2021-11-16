@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Scopes\DeletedAdminScope;
 use App\Scopes\LatestScope;
+use App\Traits\Taggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 
 class BlogPost extends Model
 {
-    use HasFactory;
+    use HasFactory, Taggable;
 
     use SoftDeletes;
 
@@ -20,7 +21,7 @@ class BlogPost extends Model
 
     public function comments()
     {
-        return $this->hasMany('App\Models\Comment')->latest();
+        return $this->morphMany('App\Models\Comment', 'commentable')->latest();
     }
 
     public function user()
@@ -28,9 +29,6 @@ class BlogPost extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function tags(){
-        return $this->belongsToMany('App\Models\Tag');
-    }
 
     public function image(){
         return $this->morphOne('App\Models\Image', 'imageable');

@@ -51,7 +51,7 @@ class PostTest extends TestCase
             ->assertStatus(302)
             ->assertSessionHas('status');
 
-        $this->assertEquals(session('status'), 'The blog post was created!');
+        $this->assertEquals(session('status'), 'Blog Post was created');
     }
 
     public function testStoreFail()
@@ -103,6 +103,7 @@ class PostTest extends TestCase
 
     public function testSee1BlogPostWithComments()
     {
+        $user=$this->user();
         $post = $this->createDummyBlogPost();
 
         // \App\Models\Comment::factory(Comment::class, 4)->create([
@@ -110,7 +111,9 @@ class PostTest extends TestCase
         // ]);
 
         Comment::factory(4)->create([
-            'blog_post_id' => $post->id
+            'commentable_id' => $post->id,
+            'commentable_type' => 'App\BlogPost',
+            'user_id' => $user->id
         ]);
 
         $response = $this->get('/posts');
