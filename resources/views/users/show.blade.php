@@ -7,14 +7,14 @@
     </div>
     <div class="col-8">
         <h3>{{ $user->name }}</h3>
+
+        <x-commentForm :route="route ('users.comments.store', ['user' => $user->id])">
+
+        </x-commentForm>
+
+        <x-commentList :comments="$user->commentsOn">
+
+        </x-commentList>
     </div>
-
-    @commentForm(['route' => route ('users.comments.store', ['user' => $user->id])])
-
-    @endcommentForm
-
-    <x-commentList :comments="$user->commentsOn">
-
-    </x-commentList>
 </div>
 @endsection
