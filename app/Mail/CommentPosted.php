@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
-class CommentPosted extends Mailable
+class CommentPosted extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
