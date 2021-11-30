@@ -7,6 +7,7 @@ use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use App\Models\User;
 use App\Models\Image;
+use App\Services\Counter;
 use Illuminate\Support\Facades\Cache;
 // use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -104,44 +105,13 @@ class PostsController extends Controller
                 ->findOrFail($id);
         });
 
-        $sessionId = session()->getId();
-        $counterKey = "blog-post-{$id}-counter";
-        $usersKey = "blog-post-{$id}-users";
+        $counter=new Counter();
 
-        $users = Cache::get($usersKey, []);
-        $usersUpdate = [];
-        $difference = 0;
-        $now = now();
-
-        foreach ($users as $session => $lastVisit) {
-            if ($now->diffInMinutes($lastVisit) >= 1) {
-                $difference--;
-            } else {
-                $usersUpdate[$session] = $lastVisit;
-            }
-        }
-
-        if (
-            !array_key_exists($sessionId, $users)
-            || $now->diffInMinutes($users[$sessionId]) >= 1
-        ) {
-            $difference++;
-        }
-
-        $usersUpdate[$sessionId] = $now;
-        Cache::forever($usersKey, $usersUpdate);
-
-        if (!Cache::has($counterKey)) {
-            Cache::forever($counterKey, 1);
-        } else {
-            Cache::increment($counterKey, $difference);
-        }
-
-        $counter = Cache::get($counterKey);
+       
 
         return view('posts.show', [
             'post' => $blogPost,
-            'counter' => $counter,
+            'counter' => $counter->increment("blog-post-{$id}", ['blog-post']),
         ]);
     }
 
